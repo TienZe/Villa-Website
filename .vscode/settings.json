@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "VillaAPI.sln"
+    "dotnet.defaultSolution": "VillaAPI.sln",
+    "cmake.configureOnOpen": false
 }
