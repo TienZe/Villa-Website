@@ -1,8 +1,10 @@
+using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VillaAPI.Data;
+using VillaAPI.Models;
 using VillaAPI.Repository.IRepository;
 
 namespace VillaAPI
@@ -13,38 +15,53 @@ namespace VillaAPI
     {
         private readonly IMapper _mapper;
         private readonly IVillaRepository _repo;
+
+        protected APIResponse _response;
         
         public VillaAPIController(IMapper mapper, IVillaRepository repo)
         {
             _mapper = mapper;
             _repo = repo;
+            _response = new();
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<VillaDTO>>> GetVillas()
+        public async Task<ActionResult<APIResponse>> GetVillas()
         {
             IEnumerable<Villa> villas = await _repo.GetAllAsync();
             var villasDTO = _mapper.Map<IEnumerable<VillaDTO>>(villas);
-            return Ok(villasDTO);
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.IsSuccess = true;
+            _response.Result = villasDTO;
+            return Ok(_response);
         }
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<VillaDTO>> GetVilla(int id)
+        public async Task<ActionResult<APIResponse>> GetVilla(int id)
         {
             if (id == 0) {
-                return BadRequest();
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
+                _response.ErrorMessages.Add("Invalid Villa ID");
+                return BadRequest(_response);
             }
 
             var villa = await _repo.GetAsync(villa => villa.Id == id);
             if (villa is null) {
+                _response.StatusCode = HttpStatusCode.NotFound;
+                _response.IsSuccess = false;
+                _response.ErrorMessages.Add("Not found an villa with specified id");
                 return NotFound();
             }
-
-            return Ok(_mapper.Map<VillaDTO>(villa));
+            
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.IsSuccess = true;
+            _response.Result = _mapper.Map<VillaDTO>(villa);
+            return Ok(_response);
         }
         
         [HttpPost]
@@ -54,6 +71,8 @@ namespace VillaAPI
         public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody]VillaCreateDTO villaDTO)
         {
             if (villaDTO is null) {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
                 return BadRequest();
             }
 
@@ -67,14 +86,17 @@ namespace VillaAPI
 
             await _repo.CreateAsync(createdVilla);
             
-            return CreatedAtAction(nameof(GetVilla), new { Id = createdVilla.Id }, createdVilla);
+            _response.StatusCode = HttpStatusCode.Created;
+            _response.IsSuccess = true;
+            _response.Result = _mapper.Map<VillaDTO>(createdVilla);
+            return CreatedAtAction(nameof(GetVilla), new { Id = createdVilla.Id }, _response);
         }
 
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteVilla(int id)
+        public async Task<ActionResult<APIResponse>> DeleteVilla(int id)
         {
             if (id <= 0) {
                 return BadRequest();
@@ -87,20 +109,22 @@ namespace VillaAPI
 
             await _repo.RemoveAsync(villa);
 
-            return NoContent();
+            _response.StatusCode = HttpStatusCode.NoContent;
+            _response.IsSuccess = true;
+            return Ok(_response);
         }
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> UpdateVilla(int id, [FromBody]VillaUpdateDTO villaDTO)
+        public async Task<ActionResult<APIResponse>> UpdateVilla(int id, [FromBody]VillaUpdateDTO villaDTO)
         {
             if (villaDTO is null) {
                 return BadRequest();
             }
 
-            var villa = await _repo.GetAsync(villa => villa.Id == id);
+            var villa = await _repo.GetAsync(villa => villa.Id == id, tracked: false);
             if (villa is null) {
                 return NotFound();
             }
@@ -112,8 +136,11 @@ namespace VillaAPI
             villa.ImageUrl = villaDTO.ImageUrl;
             villa.Amenity = villaDTO.Amenity;
 
-            await _repo.SaveAsync();
-            return NoContent();
+            await _repo.UpdateAsync(villa);
+
+            _response.StatusCode = HttpStatusCode.NoContent;
+            _response.IsSuccess = true;
+            return Ok(_response);
         }
 
         [HttpPatch("{id:int}")]
@@ -126,7 +153,7 @@ namespace VillaAPI
                 return BadRequest();
             }
 
-            var villa = await _repo.GetAsync(villa => villa.Id == id);
+            var villa = await _repo.GetAsync(villa => villa.Id == id, tracked: false);
             if (villa is null) {
                 return NotFound();
             }
@@ -145,7 +172,7 @@ namespace VillaAPI
             villa.ImageUrl = villaDTO.ImageUrl;
             villa.Amenity = villaDTO.Amenity;
 
-            await _repo.SaveAsync();
+            await _repo.UpdateAsync(villa);
 
             return NoContent();
         }

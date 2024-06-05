@@ -14,13 +14,13 @@ public class Repository<T> : IRepository<T> where T : class
         _db = db;
         _dbSet = db.Set<T>();
     }
-    public async Task CreateAsync(T entity)
+    public virtual async Task CreateAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
         await SaveAsync();
     }
 
-    public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool tracked = true)
+    public virtual async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool tracked = true)
     {
         var query = _dbSet.AsQueryable();
         
@@ -32,7 +32,7 @@ public class Repository<T> : IRepository<T> where T : class
         return await query.FirstOrDefaultAsync();
     }
 
-    public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null)
+    public virtual async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null)
     {
         var query = _dbSet.AsQueryable();
         
@@ -43,18 +43,18 @@ public class Repository<T> : IRepository<T> where T : class
         return await query.ToListAsync();
     }
 
-    public async Task RemoveAsync(T entity)
+    public virtual async Task RemoveAsync(T entity)
     {
         _db.Remove(entity);
         await SaveAsync();
     }
 
-    public async Task SaveAsync()
+    public virtual async Task SaveAsync()
     {
         await _db.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(T entity)
+    public virtual async Task UpdateAsync(T entity)
     {
         _dbSet.Update(entity);
         await SaveAsync();
