@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VillaAPI.Data;
+using VillaAPI.Repository.IRepository;
 
 namespace VillaAPI
 {
@@ -10,19 +11,20 @@ namespace VillaAPI
     [Route("api/VillaAPI")]
     public class VillaAPIController : ControllerBase
     {
-        private ApplicationDbContext _db;
-        private IMapper _mapper;
-        public VillaAPIController(ApplicationDbContext db, IMapper mapper)
+        private readonly IMapper _mapper;
+        private readonly IVillaRepository _repo;
+        
+        public VillaAPIController(IMapper mapper, IVillaRepository repo)
         {
-            _db = db;
             _mapper = mapper;
+            _repo = repo;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<VillaDTO>>> GetVillas()
         {
-            IEnumerable<Villa> villas = await _db.Villas.ToListAsync();
+            IEnumerable<Villa> villas = await _repo.GetAllAsync();
             var villasDTO = _mapper.Map<IEnumerable<VillaDTO>>(villas);
             return Ok(villasDTO);
         }
@@ -37,7 +39,7 @@ namespace VillaAPI
                 return BadRequest();
             }
 
-            var villa = await _db.Villas.FirstOrDefaultAsync(villa => villa.Id == id);
+            var villa = await _repo.GetAsync(villa => villa.Id == id);
             if (villa is null) {
                 return NotFound();
             }
@@ -55,7 +57,7 @@ namespace VillaAPI
                 return BadRequest();
             }
 
-            if (_db.Villas.Where(villa => villa.Name.ToLower() == villaDTO.Name.ToLower()).Any()) {
+            if ((await _repo.GetAsync(villa => villa.Name.ToLower() == villaDTO.Name.ToLower())) is not null) {
                 ModelState.AddModelError("CustomError", "Villa name already exists");
                 return BadRequest(ModelState);
             }
@@ -63,8 +65,7 @@ namespace VillaAPI
             var createdVilla = _mapper.Map<Villa>(villaDTO);
             createdVilla.CreatedDate = DateTime.Now;
 
-            await _db.Villas.AddAsync(createdVilla);
-            await _db.SaveChangesAsync();
+            await _repo.CreateAsync(createdVilla);
             
             return CreatedAtAction(nameof(GetVilla), new { Id = createdVilla.Id }, createdVilla);
         }
@@ -79,13 +80,12 @@ namespace VillaAPI
                 return BadRequest();
             }
 
-            var villa = _db.Villas.Find(id);
+            var villa = await _repo.GetAsync(villa => villa.Id == id);
             if (villa is null) {
                 return NotFound();
             }
 
-            _db.Villas.Remove(villa);
-            await _db.SaveChangesAsync();
+            await _repo.RemoveAsync(villa);
 
             return NoContent();
         }
@@ -100,7 +100,7 @@ namespace VillaAPI
                 return BadRequest();
             }
 
-            var villa = _db.Villas.Find(id);
+            var villa = await _repo.GetAsync(villa => villa.Id == id);
             if (villa is null) {
                 return NotFound();
             }
@@ -112,7 +112,7 @@ namespace VillaAPI
             villa.ImageUrl = villaDTO.ImageUrl;
             villa.Amenity = villaDTO.Amenity;
 
-            await _db.SaveChangesAsync();
+            await _repo.SaveAsync();
             return NoContent();
         }
 
@@ -126,7 +126,7 @@ namespace VillaAPI
                 return BadRequest();
             }
 
-            var villa = _db.Villas.Find(id);
+            var villa = await _repo.GetAsync(villa => villa.Id == id);
             if (villa is null) {
                 return NotFound();
             }
@@ -145,7 +145,7 @@ namespace VillaAPI
             villa.ImageUrl = villaDTO.ImageUrl;
             villa.Amenity = villaDTO.Amenity;
 
-            await _db.SaveChangesAsync();
+            await _repo.SaveAsync();
 
             return NoContent();
         }
