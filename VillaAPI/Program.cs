@@ -1,9 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using VillaAPI;
 using VillaAPI.Data;
+using VillaAPI.Repository;
+using VillaAPI.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddNewtonsoftJson();
+
+builder.Services.AddAutoMapper(typeof(MapperConfig));
+
+// Register Repositories
+builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
