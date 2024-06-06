@@ -1,4 +1,5 @@
 ﻿using VillaAPI.Data;
+using VillaAPI.Models;
 using VillaAPI.Repository.IRepository;
 
 namespace VillaAPI.Repository;

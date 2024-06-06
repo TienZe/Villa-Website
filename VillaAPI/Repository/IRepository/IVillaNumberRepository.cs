@@ -2,7 +2,7 @@
 
 namespace VillaAPI.Repository.IRepository;
 
-public interface IVillaRepository : IRepository<Villa>
+public interface IVillaNumberRepository : IRepository<VillaNumber>
 {
     
 }
