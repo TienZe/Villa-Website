@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VillaAPI.Data;
 using VillaAPI.Models;
+using VillaAPI.Models.Dto;
 using VillaAPI.Repository.IRepository;
 
 namespace VillaAPI

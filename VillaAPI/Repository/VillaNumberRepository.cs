@@ -10,10 +10,14 @@ public class VillaNumberRepository : Repository<VillaNumber>, IVillaNumberReposi
     public VillaNumberRepository(ApplicationDbContext db) : base(db)
     {
     }
+    public override async Task CreateAsync(VillaNumber entity)
+    {
+        entity.CreatedDate = DateTime.Now;
+        await base.CreateAsync(entity);
+    }
     public override async Task UpdateAsync(VillaNumber entity)
     {
         entity.UpdatedDate = DateTime.Now;
-        _dbSet.Update(entity);
-        await SaveAsync();
+        await base.UpdateAsync(entity);
     }
 }

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VillaAPI
+namespace VillaAPI.Models.Dto;
+
+public class VillaNumberCreateDTO
 {
-    public class VillaNumberDTO
-    {
-        [Required]
-        public int VillaNo { get; set; }
-        public string SpecialDetails { get; set; }
-    }
+    [Required]
+    public int VillaNo { get; set; }
+    public string SpecialDetails { get; set; }
 }

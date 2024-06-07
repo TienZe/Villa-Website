@@ -12,4 +12,6 @@ public class VillaNumber
     public string SpecialDetails { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
+
+    
 }
