@@ -15,11 +15,13 @@ public class VillaNumberController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IVillaNumberRepository _repo;
+    private readonly IVillaRepository _villaRepo;
     protected APIResponse _response;
 
-    public VillaNumberController(IVillaNumberRepository repo, IMapper mapper)
+    public VillaNumberController(IVillaNumberRepository repo, IVillaRepository villaRepo, IMapper mapper)
     {
         _repo = repo;
+        _villaRepo = villaRepo;
         _mapper = mapper;
         _response = new();
     }
@@ -61,6 +63,14 @@ public class VillaNumberController : ControllerBase
             return BadRequest(_response);
         }
 
+        var villa = await _villaRepo.GetAsync(villa => villa.Id == dto.VillaID);
+        if (villa is null) {
+            _response.StatusCode = HttpStatusCode.BadRequest;
+            _response.IsSuccess = false;
+            _response.ErrorMessages.Add("Villa with specied Id does not exist");
+            return BadRequest(_response);
+        }
+
         var villaNumber = _mapper.Map<VillaNumber>(dto);
         await _repo.CreateAsync(villaNumber);
 
@@ -81,7 +91,16 @@ public class VillaNumberController : ControllerBase
             return NotFound(_response);
         }
 
+        var villa = await _villaRepo.GetAsync(villa => villa.Id == dto.VillaID);
+        if (villa is null) {
+            _response.StatusCode = HttpStatusCode.BadRequest;
+            _response.IsSuccess = false;
+            _response.ErrorMessages.Add("Villa with specied Id does not exist");
+            return BadRequest(_response);
+        }
+
         villaNumber.SpecialDetails = dto.SpecialDetails;
+        villaNumber.VillaID = dto.VillaID;
 
         await _repo.UpdateAsync(villaNumber);
 
