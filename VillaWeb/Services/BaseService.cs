@@ -15,13 +15,12 @@ public class BaseService : IBaseService
         HttpClient = httpClient;
         ResponseModel = new();
     }
-    public async Task<T> SendAsync<T>(APIRequest apiRequest)
+    public async Task<T?> SendAsync<T>(APIRequest apiRequest)
     {
         try {
             var client = HttpClient.CreateClient("VillaAPI");
             HttpRequestMessage message = new();
             message.Headers.Add("Accept", "application/json");
-            message.Headers.Add("Content-Type", "application/json");
             message.RequestUri = new Uri(apiRequest.Url);
 
             if (apiRequest.Data != null) {
