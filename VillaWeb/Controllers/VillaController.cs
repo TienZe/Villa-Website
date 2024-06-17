@@ -62,7 +62,7 @@ public class VillaController : Controller
     public async Task<IActionResult> UpdateVilla(VillaUpdateDTO dto)
     {
         if (ModelState.IsValid) {
-            var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto.Id, dto);
+            var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto);
 
             if (apiResponse is not null && apiResponse.IsSuccess) {
                 return RedirectToAction(nameof(IndexVilla));
