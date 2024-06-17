@@ -136,6 +136,7 @@ namespace VillaAPI
             villa.Rate = villaDTO.Rate;
             villa.ImageUrl = villaDTO.ImageUrl;
             villa.Amenity = villaDTO.Amenity;
+            villa.Details = villaDTO.Details;
 
             await _repo.UpdateAsync(villa);
 

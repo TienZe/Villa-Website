@@ -15,4 +15,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Villa\UpdateVilla.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Villa\UpdateVilla.cshtml" />
+  </ItemGroup>
+
 </Project>
