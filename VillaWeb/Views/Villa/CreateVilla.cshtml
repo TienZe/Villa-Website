@@ -1,0 +1,65 @@
+﻿@model VillaCreateDTO
+
+<h2 class="text-center">Create new Villa</h2>
+
+<form method="post" asp-controller="Villa" asp-action="CreateVilla" class="w-50 mx-auto">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3 row">
+        <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Name" class="form-control">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="Occupancy" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Occupancy" class="form-control">
+            <span asp-validation-for="Occupancy" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="Sqft" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Sqft" class="form-control">
+            <span asp-validation-for="Sqft" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="Details" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <textarea asp-for="Details" class="form-control"></textarea>
+            <span asp-validation-for="Details" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="Rate" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Rate" class="form-control">
+            <span asp-validation-for="Rate" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="Amenity" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <textarea asp-for="Amenity" class="form-control"></textarea>
+            <span asp-validation-for="Amenity" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="ImageUrl" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="ImageUrl" class="form-control">
+            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row justify-content-end">
+        <div class="col-3">
+            <a asp-controller="Villa" asp-action="IndexVilla" class="btn btn-primary w-100">Back to List</a>
+        </div>
+        <div class="col-3">
+            <button type="submit" class="btn btn-success w-100">Create</button>
+        </div>
+    </div>
+</form>
+

@@ -27,4 +27,22 @@ public class VillaController : Controller
         }
         return View(list);
     }
+
+    public async Task<IActionResult> CreateVilla()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateVilla(VillaCreateDTO dto)
+    {
+        if (ModelState.IsValid) {
+            var apiResponse = await _villaService.CreateAsync<APIResponse>(dto);
+
+            if (apiResponse is not null && apiResponse.IsSuccess) {
+                return RedirectToAction("IndexVilla");
+            }
+        }
+        return View(dto);
+    }
 }

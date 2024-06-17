@@ -11,11 +11,11 @@ public class VillaCreateDTO
 
     public int Occupancy { get; set; }
     public int Sqft { get; set; }
-    public string Details { get; set; } = string.Empty;
+    public string? Details { get; set; }
 
     [Required(ErrorMessage = "Rate is required")]
     public double? Rate { get; set; }
 
-    public string ImageUrl { get; set; } = string.Empty;
-    public string Amenity { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public string? Amenity { get; set; }
 }
