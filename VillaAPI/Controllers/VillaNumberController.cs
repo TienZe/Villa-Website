@@ -29,7 +29,8 @@ public class VillaNumberController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<APIResponse>> GetVillaNumbers()
     {
-        IEnumerable<VillaNumber> villaNumbers = await _repo.GetAllAsync();
+        IEnumerable<VillaNumber> villaNumbers = await _repo.GetAllAsync(tracked: false
+            , includeProperties: "Villa");
         var villaNumberDtos = _mapper.Map<IEnumerable<VillaNumberDTO>>(villaNumbers);
         _response.StatusCode = HttpStatusCode.OK;
         _response.IsSuccess = true;
@@ -39,7 +40,8 @@ public class VillaNumberController : ControllerBase
     [HttpGet("{villaNo:int}")]
     public async Task<ActionResult<APIResponse>> GetVillaNumber(int villaNo)
     {
-        var villaNumber = await _repo.GetAsync(villaNumber => villaNumber.VillaNo == villaNo);
+        var villaNumber = await _repo.GetAsync(villaNumber => villaNumber.VillaNo == villaNo
+            , includeProperties: "Villa");
         if (villaNumber is null) {
             _response.StatusCode = HttpStatusCode.NotFound;
             _response.IsSuccess = false;

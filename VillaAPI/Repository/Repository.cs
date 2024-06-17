@@ -20,7 +20,8 @@ public class Repository<T> : IRepository<T> where T : class
         await SaveAsync();
     }
 
-    public virtual async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool tracked = true)
+    public virtual async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool tracked = true
+        , string? includeProperties = null)
     {
         var query = _dbSet.AsQueryable();
         
@@ -29,17 +30,36 @@ public class Repository<T> : IRepository<T> where T : class
         }
 
         query = query.Where(predicate);
+        
+        if (includeProperties is not null) {
+            string[] includePropertiesArray = includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var includeProperty in includePropertiesArray) {
+                query = query.Include(includeProperty);
+            }
+        }
+
         return await query.FirstOrDefaultAsync();
     }
 
-    public virtual async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null)
+    public virtual async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool tracked = true
+        , string? includeProperties = null)
     {
         var query = _dbSet.AsQueryable();
         
+        if (!tracked) {
+            query = query.AsNoTracking();
+        }
+
         if (predicate is not null) {
             query = query.Where(predicate);
         }
 
+        if (includeProperties is not null) {
+            string[] includePropertiesArray = includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var includeProperty in includePropertiesArray) {
+                query = query.Include(includeProperty);
+            }
+        }
         return await query.ToListAsync();
     }
 
