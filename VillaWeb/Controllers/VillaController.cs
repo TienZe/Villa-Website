@@ -40,7 +40,7 @@ public class VillaController : Controller
             var apiResponse = await _villaService.CreateAsync<APIResponse>(dto);
 
             if (apiResponse is not null && apiResponse.IsSuccess) {
-                return RedirectToAction("IndexVilla");
+                return RedirectToAction(nameof(IndexVilla));
             }
         }
         return View(dto);
@@ -65,9 +65,21 @@ public class VillaController : Controller
             var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto.Id, dto);
 
             if (apiResponse is not null && apiResponse.IsSuccess) {
-                return RedirectToAction("IndexVilla");
+                return RedirectToAction(nameof(IndexVilla));
             }
         }
         return View(dto);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteVilla([FromForm]int id)
+    {
+        var apiResponse = await _villaService.DeleteAsync<APIResponse>(id);
+
+        if (apiResponse is not null && apiResponse.IsSuccess) {
+            return RedirectToAction(nameof(IndexVilla));
+        }
+
+        return RedirectToAction(nameof(IndexVilla));
     }
 }
