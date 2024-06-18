@@ -1,31 +1,32 @@
 ﻿using System.Diagnostics;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using VillaWeb.Models;
+using VillaWeb.Models.Dto;
+using VillaWeb.Services.IServices;
 
 namespace VillaWeb.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    private readonly IVillaService _villaService;
+    private readonly IMapper _mapper;
+    public HomeController(IVillaService villaService, IMapper mapper)
     {
-        _logger = logger;
+        _villaService = villaService;
+        _mapper = mapper;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        List<VillaDTO> list = new();
+        var apiResponse = await _villaService.GetAllAsync<APIResponse>();
+
+        if (apiResponse is not null && apiResponse.IsSuccess) {
+            list = JsonConvert.DeserializeObject<List<VillaDTO>>(Convert.ToString(apiResponse.Result));
+        }
+        return View(list);
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
 }
