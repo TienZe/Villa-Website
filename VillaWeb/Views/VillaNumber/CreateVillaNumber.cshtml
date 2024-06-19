@@ -1,0 +1,40 @@
+@model VillaNumberCreateVM
+
+<h2 class="text-center">Create new Villa Number</h2>
+
+<form method="post" asp-controller="VillaNumber" asp-action="CreateVillaNumber" class="w-50 mx-auto">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3 row">
+        <label asp-for="VillaNumber.VillaNo" class="col-sm-3 col-form-label"></label>
+        <div class="col-sm-9">
+            <input asp-for="VillaNumber.VillaNo" class="form-control">
+            <span asp-validation-for="VillaNumber.VillaNo" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="VillaNumber.SpecialDetails" class="col-sm-3 col-form-label">Special Details</label>
+        <div class="col-sm-9">
+            <textarea asp-for="VillaNumber.SpecialDetails" class="form-control"></textarea>
+            <span asp-validation-for="VillaNumber.SpecialDetails" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="VillaNumber.VillaID" class="col-sm-3 col-form-label">Villa</label>
+        <div class="col-sm-9">
+            <select asp-for="VillaNumber.VillaID" asp-items="@Model.SelectListOfVillas" class="form-control">
+                <option value="" disabled selected>--Select Villa--</option>
+            </select>
+            <span asp-validation-for="VillaNumber.VillaID" class="text-danger"></span>
+        </div>
+    </div>
+    
+    <div class="mb-3 row justify-content-end">
+        <div class="col-3">
+            <a asp-controller="VillaNumber" asp-action="IndexVillaNumber" class="btn btn-primary w-100">Back to List</a>
+        </div>
+        <div class="col-3">
+            <button type="submit" class="btn btn-success w-100">Create</button>
+        </div>
+    </div>
+</form>
+
