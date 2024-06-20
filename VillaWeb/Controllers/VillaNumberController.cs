@@ -55,6 +55,7 @@ public class VillaNumberController : Controller
             var apiResponse = await _villaNumberService.CreateAsync<APIResponse>(villaNumberCreateVM.VillaNumber);
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
+                    TempData["success"] = "Villa Number created successfully!";
                     return RedirectToAction(nameof(IndexVillaNumber));
                 } else {
                     ModelState.AddModelErrors(apiResponse.ErrorMessages);
@@ -106,6 +107,7 @@ public class VillaNumberController : Controller
             var apiResponse = await _villaNumberService.UpdateAsync<APIResponse>(villaNumberUpdateVM.VillaNumber);
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
+                    TempData["success"] = "Villa Number updated successfully!";
                     return RedirectToAction(nameof(IndexVillaNumber));
                 } else {
                     ModelState.AddModelErrors(apiResponse.ErrorMessages);
@@ -131,9 +133,11 @@ public class VillaNumberController : Controller
         var apiResponse = await _villaNumberService.DeleteAsync<APIResponse>(id);
 
         if (apiResponse is not null && apiResponse.IsSuccess) {
+            TempData["success"] = "Villa Number deleted successfully!";
             return RedirectToAction(nameof(IndexVillaNumber));
         }
 
+        TempData["error"] = "Failed to delete this Villa Number!";
         return RedirectToAction(nameof(IndexVillaNumber));
     }
 }
