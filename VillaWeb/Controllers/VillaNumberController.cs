@@ -124,4 +124,16 @@ public class VillaNumberController : Controller
         }
         return View(villaNumberUpdateVM);
     }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteVillaNumber([FromForm]int id)
+    {
+        var apiResponse = await _villaNumberService.DeleteAsync<APIResponse>(id);
+
+        if (apiResponse is not null && apiResponse.IsSuccess) {
+            return RedirectToAction(nameof(IndexVillaNumber));
+        }
+
+        return RedirectToAction(nameof(IndexVillaNumber));
+    }
 }
