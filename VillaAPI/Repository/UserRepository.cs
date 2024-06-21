@@ -25,7 +25,7 @@ public class UserRepository : IUserRepository
         return user is null;
     }
 
-    public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
+    public async Task<LoginResponseDTO?> Login(LoginRequestDTO loginRequestDTO)
     {
         var user = await _db.LocalUsers.FirstOrDefaultAsync(
             user => user.Username == loginRequestDTO.Username && user.Password == loginRequestDTO.Password);
