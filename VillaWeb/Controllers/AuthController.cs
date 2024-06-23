@@ -92,4 +92,9 @@ public class AuthController : Controller
         HttpContext.Session.SetString(SD.SessionTokenKey, ""); 
         return RedirectToAction("Index", "Home");
     }
+
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
 }

@@ -25,7 +25,7 @@ builder.Services.AddAuthentication(options => {
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
     options.LoginPath = "/Auth/Login";
-    options.AccessDeniedPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
 });
 
 

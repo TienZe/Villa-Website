@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using VillaWeb.Models;
@@ -28,11 +29,13 @@ public class VillaController : Controller
         return View(list);
     }
 
+    [Authorize(Roles = "admin")]
     public IActionResult CreateVilla()
     {
         return View();
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> CreateVilla(VillaCreateDTO dto)
     {
@@ -46,7 +49,7 @@ public class VillaController : Controller
         }
         return View(dto);
     }
-
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> UpdateVilla(int id)
     {
         var apiResponse = await _villaService.GetAsync<APIResponse>(id);
@@ -58,7 +61,7 @@ public class VillaController : Controller
 
         return NotFound();
     }
-
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> UpdateVilla(VillaUpdateDTO dto)
     {
@@ -72,7 +75,7 @@ public class VillaController : Controller
         }
         return View(dto);
     }
-
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> DeleteVilla([FromForm]int id)
     {

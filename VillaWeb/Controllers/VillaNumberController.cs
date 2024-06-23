@@ -7,6 +7,7 @@ using VillaWeb.Models.Dto;
 using VillaWeb.Models.VM;
 using VillaWeb.Services.IServices;
 using VillaWeb.Infrastructures;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VillaWeb;
 public class VillaNumberController : Controller
@@ -32,6 +33,7 @@ public class VillaNumberController : Controller
         return View(list);
     }
 
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> CreateVillaNumber()
     {   
         VillaNumberCreateVM villaNumberVM = new();
@@ -48,6 +50,7 @@ public class VillaNumberController : Controller
         return View(villaNumberVM);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> CreateVillaNumber(VillaNumberCreateVM villaNumberCreateVM)
     {
@@ -75,6 +78,7 @@ public class VillaNumberController : Controller
         return View(villaNumberCreateVM);
     }
 
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> UpdateVillaNumber(int id)
     {   
         // Get the villa number with specified id
@@ -100,6 +104,7 @@ public class VillaNumberController : Controller
         return NotFound();    
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> UpdateVillaNumber(VillaNumberUpdateVM villaNumberUpdateVM)
     {
@@ -126,7 +131,8 @@ public class VillaNumberController : Controller
         }
         return View(villaNumberUpdateVM);
     }
-
+    
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> DeleteVillaNumber([FromForm]int id)
     {
