@@ -23,7 +23,11 @@ public class BaseService : IBaseService
             message.Headers.Add("Accept", "application/json");
             message.RequestUri = new Uri(apiRequest.Url);
 
-            if (apiRequest.Data != null) {
+            if (apiRequest.Token is not null) {
+                message.Headers.Add("Authorization", "Bearer " + apiRequest.Token);
+            }
+                
+            if (apiRequest.Data is not null) {
                 // Has data, need to serilize this data to the body of the request
                 message.Content = new StringContent(
                         JsonConvert.SerializeObject(apiRequest.Data), 
