@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using VillaUtility;
 using VillaWeb.Models;
 using VillaWeb.Models.Dto;
 using VillaWeb.Services.IServices;
@@ -29,18 +30,19 @@ public class VillaController : Controller
         return View(list);
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     public IActionResult CreateVilla()
     {
         return View();
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPost]
     public async Task<IActionResult> CreateVilla(VillaCreateDTO dto)
     {
         if (ModelState.IsValid) {
-            var apiResponse = await _villaService.CreateAsync<APIResponse>(dto);
+            var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+            var apiResponse = await _villaService.CreateAsync<APIResponse>(dto, token);
 
             if (apiResponse is not null && apiResponse.IsSuccess) {
                 TempData["success"] = "Villa created successfully!";
@@ -49,7 +51,7 @@ public class VillaController : Controller
         }
         return View(dto);
     }
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     public async Task<IActionResult> UpdateVilla(int id)
     {
         var apiResponse = await _villaService.GetAsync<APIResponse>(id);
@@ -61,12 +63,13 @@ public class VillaController : Controller
 
         return NotFound();
     }
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPost]
     public async Task<IActionResult> UpdateVilla(VillaUpdateDTO dto)
     {
         if (ModelState.IsValid) {
-            var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto);
+            var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+            var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto, token);
 
             if (apiResponse is not null && apiResponse.IsSuccess) {
                 TempData["success"] = "Villa updated successfully!";
@@ -75,11 +78,12 @@ public class VillaController : Controller
         }
         return View(dto);
     }
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPost]
     public async Task<IActionResult> DeleteVilla([FromForm]int id)
     {
-        var apiResponse = await _villaService.DeleteAsync<APIResponse>(id);
+        var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+        var apiResponse = await _villaService.DeleteAsync<APIResponse>(id, token);
 
         if (apiResponse is not null && apiResponse.IsSuccess) {
             TempData["success"] = "Villa deleted successfully!";

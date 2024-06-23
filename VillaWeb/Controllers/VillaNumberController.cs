@@ -8,6 +8,7 @@ using VillaWeb.Models.VM;
 using VillaWeb.Services.IServices;
 using VillaWeb.Infrastructures;
 using Microsoft.AspNetCore.Authorization;
+using VillaUtility;
 
 namespace VillaWeb;
 public class VillaNumberController : Controller
@@ -33,7 +34,7 @@ public class VillaNumberController : Controller
         return View(list);
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     public async Task<IActionResult> CreateVillaNumber()
     {   
         VillaNumberCreateVM villaNumberVM = new();
@@ -50,12 +51,13 @@ public class VillaNumberController : Controller
         return View(villaNumberVM);
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPost]
     public async Task<IActionResult> CreateVillaNumber(VillaNumberCreateVM villaNumberCreateVM)
     {
         if (ModelState.IsValid) {
-            var apiResponse = await _villaNumberService.CreateAsync<APIResponse>(villaNumberCreateVM.VillaNumber);
+            var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+            var apiResponse = await _villaNumberService.CreateAsync<APIResponse>(villaNumberCreateVM.VillaNumber, token);
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
                     TempData["success"] = "Villa Number created successfully!";
@@ -78,7 +80,7 @@ public class VillaNumberController : Controller
         return View(villaNumberCreateVM);
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     public async Task<IActionResult> UpdateVillaNumber(int id)
     {   
         // Get the villa number with specified id
@@ -104,12 +106,13 @@ public class VillaNumberController : Controller
         return NotFound();    
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPost]
     public async Task<IActionResult> UpdateVillaNumber(VillaNumberUpdateVM villaNumberUpdateVM)
     {
         if (ModelState.IsValid) {
-            var apiResponse = await _villaNumberService.UpdateAsync<APIResponse>(villaNumberUpdateVM.VillaNumber);
+            var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+            var apiResponse = await _villaNumberService.UpdateAsync<APIResponse>(villaNumberUpdateVM.VillaNumber, token);
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
                     TempData["success"] = "Villa Number updated successfully!";
@@ -132,11 +135,12 @@ public class VillaNumberController : Controller
         return View(villaNumberUpdateVM);
     }
     
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPost]
     public async Task<IActionResult> DeleteVillaNumber([FromForm]int id)
     {
-        var apiResponse = await _villaNumberService.DeleteAsync<APIResponse>(id);
+        var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+        var apiResponse = await _villaNumberService.DeleteAsync<APIResponse>(id, token);
 
         if (apiResponse is not null && apiResponse.IsSuccess) {
             TempData["success"] = "Villa Number deleted successfully!";

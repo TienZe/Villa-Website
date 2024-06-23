@@ -1,11 +1,13 @@
 ﻿using System.Net;
 using System.Runtime.CompilerServices;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using VillaAPI.Models;
 using VillaAPI.Models.Dto;
 using VillaAPI.Repository.IRepository;
+using VillaUtility;
 
 namespace VillaAPI.Controllers;
 
@@ -55,6 +57,7 @@ public class VillaNumberController : ControllerBase
         return Ok(_response);
     }
 
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPost]
     public async Task<ActionResult<APIResponse>> CreateVillaNumber([FromBody]VillaNumberCreateDTO dto)
     {
@@ -81,7 +84,8 @@ public class VillaNumberController : ControllerBase
         _response.Result = _mapper.Map<VillaNumberDTO>(villaNumber);
         return CreatedAtAction(nameof(GetVillaNumber), new { villaNo = villaNumber.VillaNo },_response);
     }
-
+    
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPut("{villaNo:int}")]
     public async Task<ActionResult<APIResponse>> UpdateVillaNumber(int villaNo, [FromBody]VillaNumberUpdateDTO dto)
     {
@@ -110,7 +114,8 @@ public class VillaNumberController : ControllerBase
         _response.IsSuccess = true;
         return Ok(_response);
     }
-    
+        
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpDelete("{villaNo:int}")]
     public async Task<ActionResult<APIResponse>> DeleteVillaNumber(int villaNo)
     {
@@ -128,7 +133,8 @@ public class VillaNumberController : ControllerBase
         _response.IsSuccess = true;
         return Ok(_response);
     }
-
+    
+    [Authorize(Roles = SD.Role.Admin)]
     [HttpPatch("{villaNo:int}")]
     public async Task<ActionResult<APIResponse>> UpdatePartiallyVillaNumber(int villaNo, [FromBody]JsonPatchDocument<VillaNumberUpdateDTO> patchDoc)
     {

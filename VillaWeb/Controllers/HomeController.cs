@@ -22,7 +22,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         List<VillaDTO> list = new();
-        var apiResponse = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionTokenKey)) ;
+        var apiResponse = await _villaService.GetAllAsync<APIResponse>() ;
 
         if (apiResponse is not null && apiResponse.IsSuccess) {
             list = JsonConvert.DeserializeObject<List<VillaDTO>>(Convert.ToString(apiResponse.Result));

@@ -3,11 +3,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using VillaAPI.Data;
 using VillaAPI.Models;
 using VillaAPI.Models.Dto;
 using VillaAPI.Repository.IRepository;
+using VillaUtility;
 
 namespace VillaAPI
 {
@@ -28,7 +27,6 @@ namespace VillaAPI
         }
 
         [HttpGet]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -43,7 +41,6 @@ namespace VillaAPI
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -72,7 +69,10 @@ namespace VillaAPI
             return Ok(_response);
         }
         
+        [Authorize(Roles = SD.Role.Admin)]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -101,7 +101,7 @@ namespace VillaAPI
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "TEST")]
+        [Authorize(Roles = SD.Role.Admin)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -126,6 +126,7 @@ namespace VillaAPI
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = SD.Role.Admin)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -156,6 +157,7 @@ namespace VillaAPI
         }
 
         [HttpPatch("{id:int}")]
+        [Authorize(Roles = SD.Role.Admin)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

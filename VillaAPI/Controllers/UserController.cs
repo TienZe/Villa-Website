@@ -1,9 +1,10 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using VillaAPI.Migrations;
 using VillaAPI.Models;
 using VillaAPI.Models.Dto;
 using VillaAPI.Repository.IRepository;
-
+using VillaUtility;
 namespace VillaAPI.Controllers;
 
 [ApiController]
@@ -46,6 +47,20 @@ public class UserController : ControllerBase
             _response.IsSuccess = false;
             return BadRequest(_response);
         }
+
+        var role = registerationRequestDTO.Role;
+        if (role is not null) {
+            var roleList = SD.Role.GetRoles();
+            if (!roleList.Contains(role)) {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.ErrorMessages.Add("Invalid role");
+                _response.IsSuccess = false;
+                return BadRequest(_response);
+            }
+        } else {
+            role = SD.Role.User;
+        }
+
         await _userRepo.Register(registerationRequestDTO);
 
         _response.StatusCode = HttpStatusCode.OK;
