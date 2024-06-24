@@ -26,6 +26,8 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 
+builder.Services.AddResponseCaching();
+
 // Register Repositories
 builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();

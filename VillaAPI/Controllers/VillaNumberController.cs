@@ -29,6 +29,7 @@ public class VillaNumberController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 30)]
     public async Task<ActionResult<APIResponse>> GetVillaNumbers()
     {
         IEnumerable<VillaNumber> villaNumbers = await _repo.GetAllAsync(tracked: false
