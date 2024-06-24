@@ -31,9 +31,16 @@ namespace VillaAPI
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetVillas()
+        public async Task<ActionResult<APIResponse>> GetVillas([FromQuery]string? search)
         {
-            IEnumerable<Villa> villas = await _repo.GetAllAsync();
+            IEnumerable<Villa> villas;
+            if (string.IsNullOrEmpty(search)) {
+                villas = await _repo.GetAllAsync();
+            } else {
+                // SQL Collation is defaultly case-insensitive
+                villas = await _repo.GetAllAsync(villa => villa.Name.Contains(search));
+            }
+            
             var villasDTO = _mapper.Map<IEnumerable<VillaDTO>>(villas);
             _response.StatusCode = HttpStatusCode.OK;
             _response.IsSuccess = true;
