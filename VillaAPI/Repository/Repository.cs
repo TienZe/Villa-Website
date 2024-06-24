@@ -41,8 +41,8 @@ public class Repository<T> : IRepository<T> where T : class
         return await query.FirstOrDefaultAsync();
     }
 
-    public virtual async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool tracked = true
-        , string? includeProperties = null)
+    public virtual async Task<PaginatedList<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool tracked = true
+        , string? includeProperties = null, int pageIndex = 1, int pageSize = 3)
     {
         var query = _dbSet.AsQueryable();
         
@@ -60,7 +60,7 @@ public class Repository<T> : IRepository<T> where T : class
                 query = query.Include(includeProperty);
             }
         }
-        return await query.ToListAsync();
+        return await PaginatedList<T>.CreateAsync(query, pageIndex, pageSize);
     }
 
     public virtual async Task RemoveAsync(T entity)

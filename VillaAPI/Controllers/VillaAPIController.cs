@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -31,17 +32,24 @@ namespace VillaAPI
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetVillas([FromQuery]string? search)
+        public async Task<ActionResult<APIResponse>> GetVillas([FromQuery]string? search, [FromQuery]int? pageIndex)
         {
-            IEnumerable<Villa> villas;
+            pageIndex = pageIndex ?? 1;
+
+            PaginatedList<Villa> paginatedVillas;
             if (string.IsNullOrEmpty(search)) {
-                villas = await _repo.GetAllAsync();
+                paginatedVillas = await _repo.GetAllAsync(pageIndex: pageIndex.Value);
             } else {
                 // SQL Collation is defaultly case-insensitive
-                villas = await _repo.GetAllAsync(villa => villa.Name.Contains(search));
+                paginatedVillas = await _repo.GetAllAsync(villa => villa.Name.Contains(search)
+                    , pageIndex: pageIndex.Value);
             }
             
-            var villasDTO = _mapper.Map<IEnumerable<VillaDTO>>(villas);
+            // Add pagination metadata to response header
+            string paginationMetaData = JsonSerializer.Serialize(paginatedVillas.MetaData);
+            Response.Headers.Add("X-Pagination", paginationMetaData);
+
+            var villasDTO = _mapper.Map<IEnumerable<VillaDTO>>(paginatedVillas);
             _response.StatusCode = HttpStatusCode.OK;
             _response.IsSuccess = true;
             _response.Result = villasDTO;
