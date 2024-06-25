@@ -1,16 +1,28 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using VillaAPI;
 using VillaAPI.Data;
+using VillaAPI.Models;
 using VillaAPI.Repository;
 using VillaAPI.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options => {
+        options.InvalidModelStateResponseFactory = context => {
+            var modelBindingAndValidationError = context.ModelState.ToErrorDictionary();
+            return new BadRequestObjectResult(APIResponse.BadRequest(
+                validationErrors: modelBindingAndValidationError
+            ));
+        };
+    })
+    .AddNewtonsoftJson();
+                    
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

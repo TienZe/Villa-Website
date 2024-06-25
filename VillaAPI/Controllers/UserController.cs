@@ -12,11 +12,9 @@ namespace VillaAPI.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserRepository _userRepo;
-    protected APIResponse _response;
     public UserController(IUserRepository userRepo)
     {
         _userRepo = userRepo;
-        _response = new();
     }
 
     [HttpPost("login")]
@@ -25,37 +23,30 @@ public class UserController : ControllerBase
         LoginResponseDTO? loginResponse = await _userRepo.Login(loginRequestDTO);
         if (loginResponse is null)
         {
-            _response.StatusCode = HttpStatusCode.BadRequest;
-            _response.ErrorMessages.Add("Invalid username or password");
-            _response.IsSuccess = false;
-            return BadRequest(_response);
+            return BadRequest(APIResponse.BadRequest(
+                errorMessages: new string[] { "Invalid username or password" }
+            ));
         }
 
-        _response.StatusCode = HttpStatusCode.OK;
-        _response.IsSuccess = true;
-        _response.Result = loginResponse;
-        return Ok(_response);
+        return Ok(APIResponse.Ok(loginResponse));
     }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody]RegisterationRequestDTO registerationRequestDTO)
     {
         bool isUniqueUsername = _userRepo.IsUniqueUser(registerationRequestDTO.Username);
-        if (!isUniqueUsername)
-        {
-            _response.StatusCode = HttpStatusCode.BadRequest;
-            _response.ErrorMessages.Add("Username already exists");
-            _response.IsSuccess = false;
-            return BadRequest(_response);
+        if (!isUniqueUsername) {
+            return BadRequest(APIResponse.BadRequest(
+                errorMessages: new string[] { "Username already exists" }
+            ));
         }
 
         var role = registerationRequestDTO.Role;
         if (role is not null) {
             var roleList = SD.Role.GetRoles();
             if (!roleList.Contains(role)) {
-                _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.ErrorMessages.Add("Invalid role");
-                _response.IsSuccess = false;
-                return BadRequest(_response);
+                return BadRequest(APIResponse.BadRequest(
+                    errorMessages: new string[] { "Invalid role" }
+                ));
             }
         } else {
             role = SD.Role.User;
@@ -63,8 +54,6 @@ public class UserController : ControllerBase
 
         await _userRepo.Register(registerationRequestDTO);
 
-        _response.StatusCode = HttpStatusCode.OK;
-        _response.IsSuccess = true;
-        return Ok(_response);
+        return Ok(APIResponse.Ok());
     }
 }
