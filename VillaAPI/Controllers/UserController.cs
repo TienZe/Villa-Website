@@ -49,7 +49,7 @@ public class UserController : ControllerBase
                 ));
             }
         } else {
-            role = SD.Role.User;
+            registerationRequestDTO.Role = SD.Role.User;
         }
 
         await _userRepo.Register(registerationRequestDTO);
