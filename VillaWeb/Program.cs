@@ -11,7 +11,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    int idleTimeout = builder.Configuration.GetValue<int>("SessionAndCookiesIdleTimeout");
+    options.IdleTimeout = TimeSpan.FromMinutes(idleTimeout); // How long the session can be idle before it expires
+                                                             // Renew automatically the expiration time if the user interacts with the site
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -23,7 +25,11 @@ builder.Services.AddAuthentication(options => {
     options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+
+    int idleTimeout = builder.Configuration.GetValue<int>("SessionAndCookiesIdleTimeout");
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(idleTimeout);
+    options.SlidingExpiration = true; // renew the expiration time if the user interacts with the site
+
     options.LoginPath = "/Auth/Login";
     options.AccessDeniedPath = "/Auth/AccessDenied";
 });
