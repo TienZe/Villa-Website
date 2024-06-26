@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Newtonsoft.Json;
 using VillaUtility;
 using VillaWeb.Models;
@@ -58,8 +59,11 @@ public class BaseService : IBaseService
             return apiResponseObject;
         } catch (Exception e) {
             var dto = new APIResponse() {
+                StatusCode = HttpStatusCode.InternalServerError,
                 IsSuccess = false,
-                ErrorMessages = new List<string> { e.Message },
+                ErrorMessages = new Dictionary<string, List<string>>() {
+                    { "", new List<string>() {"The API Gateway occured an error!"} }
+                },
             };
             var res = JsonConvert.SerializeObject(dto);
             var apiResponseObject = JsonConvert.DeserializeObject<T>(res);
