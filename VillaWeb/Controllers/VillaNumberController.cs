@@ -63,7 +63,7 @@ public class VillaNumberController : Controller
                     TempData["success"] = "Villa Number created successfully!";
                     return RedirectToAction(nameof(IndexVillaNumber));
                 } else {
-                    ModelState.AddModelErrors(apiResponse.ErrorMessages);
+                    ModelState.AddErrors(apiResponse.ErrorMessages);
                 }
             }
         }
@@ -118,7 +118,7 @@ public class VillaNumberController : Controller
                     TempData["success"] = "Villa Number updated successfully!";
                     return RedirectToAction(nameof(IndexVillaNumber));
                 } else {
-                    ModelState.AddModelErrors(apiResponse.ErrorMessages);
+                    ModelState.AddErrors(apiResponse.ErrorMessages);
                 }
             }
         }
