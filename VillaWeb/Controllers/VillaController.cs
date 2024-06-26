@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using VillaUtility;
+using VillaWeb.Infrastructures;
 using VillaWeb.Models;
 using VillaWeb.Models.Dto;
 using VillaWeb.Services.IServices;
@@ -44,9 +45,13 @@ public class VillaController : Controller
             var token = HttpContext.Session.GetString(SD.SessionTokenKey);
             var apiResponse = await _villaService.CreateAsync<APIResponse>(dto, token);
 
-            if (apiResponse is not null && apiResponse.IsSuccess) {
-                TempData["success"] = "Villa created successfully!";
-                return RedirectToAction(nameof(IndexVilla));
+            if (apiResponse is not null ) {
+                if (apiResponse.IsSuccess) {
+                    TempData["success"] = "Villa created successfully!";
+                    return RedirectToAction(nameof(IndexVilla));
+                }
+                // Error occurred
+                ModelState.AddErrors(apiResponse.ErrorMessages);
             }
         }
         return View(dto);
@@ -71,9 +76,13 @@ public class VillaController : Controller
             var token = HttpContext.Session.GetString(SD.SessionTokenKey);
             var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto, token);
 
-            if (apiResponse is not null && apiResponse.IsSuccess) {
-                TempData["success"] = "Villa updated successfully!";
-                return RedirectToAction(nameof(IndexVilla));
+            if (apiResponse is not null) {
+                if (apiResponse.IsSuccess) {
+                    TempData["success"] = "Villa updated successfully!";
+                    return RedirectToAction(nameof(IndexVilla));
+                }
+                // Error occurred
+                ModelState.AddErrors(apiResponse.ErrorMessages);
             }
         }
         return View(dto);
@@ -85,9 +94,11 @@ public class VillaController : Controller
         var token = HttpContext.Session.GetString(SD.SessionTokenKey);
         var apiResponse = await _villaService.DeleteAsync<APIResponse>(id, token);
 
-        if (apiResponse is not null && apiResponse.IsSuccess) {
-            TempData["success"] = "Villa deleted successfully!";
-            return RedirectToAction(nameof(IndexVilla));
+        if (apiResponse is not null) {
+            if (apiResponse.IsSuccess) {
+                TempData["success"] = "Villa deleted successfully!";
+                return RedirectToAction(nameof(IndexVilla));
+            }
         }
 
         TempData["error"] = "Failed to delete this Villa!";

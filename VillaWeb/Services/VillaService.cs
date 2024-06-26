@@ -51,7 +51,7 @@ public class VillaService : BaseService, IVillaService
         });
     }
 
-    public Task<T> UpdateAsync<T>(VillaUpdateDTO dto, string? token = null)
+    public Task<T?> UpdateAsync<T>(VillaUpdateDTO dto, string? token = null)
     {
         return SendAsync<T>(new APIRequest() {
             ApiType = SD.ApiType.PUT,
