@@ -42,7 +42,7 @@ public class Repository<T> : IRepository<T> where T : class
     }
 
     public virtual async Task<PaginatedList<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool tracked = true
-        , string? includeProperties = null, int pageIndex = 1, int pageSize = 3)
+        , string? includeProperties = null, int pageIndex = 1, int pageSize = 10)
     {
         var query = _dbSet.AsQueryable();
         

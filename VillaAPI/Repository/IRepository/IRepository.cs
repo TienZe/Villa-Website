@@ -6,7 +6,7 @@ namespace VillaAPI.Repository.IRepository;
 public interface IRepository<T> where T : class
 {
     Task<PaginatedList<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, bool tracked = true
-        , string? includeProperties = null, int pageIndex = 1, int pageSize = 3);
+        , string? includeProperties = null, int pageIndex = 1, int pageSize = 10);
     Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool tracked = true
         , string? includeProperties = null);
 
