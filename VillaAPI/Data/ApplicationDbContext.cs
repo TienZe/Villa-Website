@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VillaAPI.Models;
+using VillaUtility;
 
 namespace VillaAPI.Data;
 
@@ -83,6 +85,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   Amenity = "",
                   CreatedDate = DateTime.Now
               }
+        );
+
+        // Seed the user role
+        modelBuilder.Entity<IdentityRole>().HasData(
+            new IdentityRole { Name = SD.Role.Admin, NormalizedName = SD.Role.Admin.ToUpper() },
+            new IdentityRole { Name = SD.Role.User, NormalizedName = SD.Role.User.ToUpper() }
         );
     }
 }
