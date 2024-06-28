@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using VillaAPI.Infrastructure;
 using VillaAPI.Models;
 using VillaAPI.Models.Dto;
 using VillaAPI.Repository.IRepository;

@@ -1,22 +1,30 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VillaAPI.Data;
+using VillaAPI.Infrastructure;
 using VillaAPI.Models;
 using VillaAPI.Models.Dto;
 using VillaAPI.Repository.IRepository;
+using VillaUtility;
 
 namespace VillaAPI;
 public class UserRepository : IUserRepository
 {
     private readonly ApplicationDbContext _db;
     private readonly string _secretKey;
-    public UserRepository(ApplicationDbContext db, IConfiguration config)
+
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public UserRepository(ApplicationDbContext db, IConfiguration config
+        , UserManager<ApplicationUser> userManager)
     {
         _db = db;
         _secretKey = config["ApiSettings:Secret"];
+        _userManager = userManager;
     }
 
     public bool IsUniqueUser(string username)
@@ -27,12 +35,14 @@ public class UserRepository : IUserRepository
 
     public async Task<LoginResponseDTO?> Login(LoginRequestDTO loginRequestDTO)
     {
-        var user = await _db.LocalUsers.FirstOrDefaultAsync(
-            user => user.Username == loginRequestDTO.Username && user.Password == loginRequestDTO.Password);
-        
-        if (user is null) {
+        var user = await _userManager.FindByNameAsync(loginRequestDTO.Username);
+        var isValidCredentials = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
+        if (user is null || !isValidCredentials) {
             return null;
         }
+        
+        var roles = await _userManager.GetRolesAsync(user);
+        var userRole = roles.FirstOrDefault();
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_secretKey);
@@ -40,8 +50,9 @@ public class UserRepository : IUserRepository
         var tokenDescriptor = new SecurityTokenDescriptor() {
             Subject = new ClaimsIdentity(
                 new Claim[] {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Role, userRole)
                 }
             ),
             Expires = DateTime.UtcNow.AddHours(10),
@@ -52,26 +63,33 @@ public class UserRepository : IUserRepository
         var tokenString = tokenHandler.WriteToken(token);
 
         var loginResponse = new LoginResponseDTO() {
-            User = user,
+            User = new UserDTO { Id = user.Id, Name = user.Name, UserName = user.UserName},
+            Role = userRole,
             Token = tokenString
         };
 
         return loginResponse;
     }   
 
-    public async Task<LocalUser> Register(RegisterationRequestDTO registerationRequestDTO)
+    public async Task<ApplicationUser> Register(RegisterationRequestDTO registerationRequestDTO)
     {
-        LocalUser user = new()
-        {
+        var newUser = new ApplicationUser() {
             Name = registerationRequestDTO.Name,
-            Username = registerationRequestDTO.Username,
-            Password = registerationRequestDTO.Password,
-            Role = registerationRequestDTO.Role
+            UserName = registerationRequestDTO.Username,
         };
-        await _db.LocalUsers.AddAsync(user);
-        await _db.SaveChangesAsync();
 
-        user.Password = string.Empty;
-        return user;
+        var result = await _userManager.CreateAsync(newUser, registerationRequestDTO.Password);
+
+        if (!result.Succeeded) {
+            throw new IdentityException("Failed to create a new user", result.Errors.Select(error => error.Description));
+        }
+
+        var add2RoleResult = await _userManager.AddToRoleAsync(newUser, registerationRequestDTO.Role ?? SD.Role.User);
+
+        if (!add2RoleResult.Succeeded) {
+            throw new IdentityException("Failed to assign the specified role to user", result.Errors.Select(error => error.Description));
+        }
+
+        return newUser;
     }
 }

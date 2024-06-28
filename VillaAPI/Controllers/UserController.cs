@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using VillaAPI.Infrastructure;
 using VillaAPI.Migrations;
 using VillaAPI.Models;
 using VillaAPI.Models.Dto;
@@ -52,7 +53,13 @@ public class UserController : ControllerBase
             registerationRequestDTO.Role = SD.Role.User;
         }
 
-        await _userRepo.Register(registerationRequestDTO);
+        try {
+            await _userRepo.Register(registerationRequestDTO);
+        } catch (IdentityException e) {
+            return BadRequest(APIResponse.BadRequest(
+                errorMessages: e.Errors
+            ));
+        }
 
         return Ok(APIResponse.Ok());
     }

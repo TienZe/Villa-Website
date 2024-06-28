@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
+namespace VillaAPI.Infrastructure;
+
 public static class ModelStateExtensions
 {
     public static Dictionary<string, List<string>> ToErrorDictionary(this ModelStateDictionary modelState)

@@ -7,11 +7,28 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using VillaAPI;
 using VillaAPI.Data;
+using VillaAPI.Infrastructure;
 using VillaAPI.Models;
 using VillaAPI.Repository;
 using VillaAPI.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ApplicationDbContext>(option => {
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
+});
+
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>(); 
+builder.Services.Configure<IdentityOptions>(options => {
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+});
+
 
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options => {
@@ -24,7 +41,8 @@ builder.Services.AddControllers()
     })
     .AddNewtonsoftJson();
                     
-
+// Identity's default authentication is cookie authentication
+// Must place this config before AddIdentity to override the authentication scheme
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -71,21 +89,6 @@ builder.Services.AddSwaggerGen(options => {
             new List<string>()
         }
     });
-});
-
-builder.Services.AddDbContext<ApplicationDbContext>(option => {
-    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
-});
-
-
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>(); 
-builder.Services.Configure<IdentityOptions>(options => {
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
 });
 
 var app = builder.Build();
