@@ -266,7 +266,7 @@ namespace VillaAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LocalUsers");
+                    b.ToTable("LocalUsers", (string)null);
                 });
 
             modelBuilder.Entity("VillaAPI.Models.Villa", b =>
@@ -307,7 +307,7 @@ namespace VillaAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Villas");
+                    b.ToTable("Villas", (string)null);
 
                     b.HasData(
                         new
@@ -398,7 +398,7 @@ namespace VillaAPI.Migrations
 
                     b.HasIndex("VillaID");
 
-                    b.ToTable("VillaNumbers");
+                    b.ToTable("VillaNumbers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -64,6 +64,9 @@ builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+// Register SeedData
+builder.Services.AddScoped<SeedData>();
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -106,5 +109,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Apply seed data
+using (var scope = app.Services.CreateScope()) 
+{
+    var seedData = scope.ServiceProvider.GetRequiredService<SeedData>();
+    await seedData.SeedRoles();
+    await seedData.SeedAdminAccount();
+    await seedData.SeedExampleData();
+}
+
 
 app.Run();
