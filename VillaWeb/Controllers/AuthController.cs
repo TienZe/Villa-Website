@@ -41,9 +41,9 @@ public class AuthController : Controller
 
                     // Create claims
                     var identity = new ClaimsIdentity(new[] {
-                        new Claim(ClaimTypes.Name, loginResponseDTO.User.Username),
+                        new Claim(ClaimTypes.Name, loginResponseDTO.User.UserName),
                         new Claim(ClaimTypes.NameIdentifier, loginResponseDTO.User.Id.ToString()),
-                        new Claim(ClaimTypes.Role, loginResponseDTO.User.Role)
+                        new Claim(ClaimTypes.Role, loginResponseDTO.Role)
                     }, CookieAuthenticationDefaults.AuthenticationScheme);
 
                     // Create principal
