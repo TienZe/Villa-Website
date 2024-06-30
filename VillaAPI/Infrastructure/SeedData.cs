@@ -51,7 +51,7 @@ public class SeedData
                 {
                     Name = "Royal Villa",
                     Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                    ImageUrl = "(https://dotnetmastery.com/bluevillaimages/villa3.jpg",
+                    ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa3.jpg",
                     Occupancy = 4,
                     Rate = 200,
                     Sqft = 550,
