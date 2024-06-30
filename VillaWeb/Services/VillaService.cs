@@ -1,5 +1,6 @@
 ﻿using System;
 using VillaUtility;
+using VillaWeb.Infrastructures;
 using VillaWeb.Models;
 using VillaWeb.Models.Dto;
 using VillaWeb.Services.IServices;
@@ -21,6 +22,7 @@ public class VillaService : BaseService, IVillaService
             Url = _villaUrl + "/api/VillaAPI",
             Data = dto,
             Token = token,
+            ContentType = ContentTypes.MultipartFormData,
         });
     }
 
@@ -58,6 +60,7 @@ public class VillaService : BaseService, IVillaService
             Url = _villaUrl + "/api/VillaAPI/" + dto.Id,
             Data = dto,
             Token = token,
+            ContentType = ContentTypes.MultipartFormData,
         });    
     }
 }

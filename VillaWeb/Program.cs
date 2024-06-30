@@ -13,7 +13,7 @@ builder.Services.AddSession(options =>
 {
     int idleTimeout = builder.Configuration.GetValue<int>("SessionAndCookiesIdleTimeout");
     options.IdleTimeout = TimeSpan.FromMinutes(idleTimeout); // How long the session can be idle before it expires
-                                                             // Renew automatically the expiration time if the user interacts with the site
+                                                             // Renew automatically the expiration time if accessing the session
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
