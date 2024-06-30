@@ -121,3 +121,4 @@ src/.vs/config/applicationhost.config
 
 # Ignore the images folder
 VillaWeb/wwwroot/images/
+VillaAPI/wwwroot/images/villas/

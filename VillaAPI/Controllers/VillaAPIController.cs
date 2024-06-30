@@ -18,12 +18,14 @@ namespace VillaAPI
     {
         private readonly IMapper _mapper;
         private readonly IVillaRepository _repo;
+        private readonly FileService _fileService;
 
-        
-        public VillaAPIController(IMapper mapper, IVillaRepository repo)
+
+        public VillaAPIController(IMapper mapper, IVillaRepository repo, FileService fileService)
         {
             _mapper = mapper;
             _repo = repo;
+            _fileService = fileService;
         }
 
         [HttpGet]
@@ -84,7 +86,7 @@ namespace VillaAPI
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody]VillaCreateDTO villaDTO)
+        public async Task<ActionResult<VillaDTO>> CreateVilla([FromForm]VillaCreateDTO villaDTO)
         {
             if (villaDTO is null) {
                 return BadRequest(APIResponse.BadRequest(
@@ -100,8 +102,25 @@ namespace VillaAPI
             }
 
             var createdVilla = _mapper.Map<Villa>(villaDTO);
-            createdVilla.CreatedDate = DateTime.Now;
 
+            if (villaDTO.Image is not null) {
+                // Upload image to server
+                try {
+                    string filePath = _fileService.UploadImage(villaDTO.Image, ConfigConstant.VillaUploadImagePath);
+                    
+                    createdVilla.ImageLocalPath = filePath;
+                    string baseUrl = $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase}";
+                    createdVilla.ImageUrl = $"{baseUrl}/{filePath}";
+                } catch (Exception e) {
+                    return BadRequest(APIResponse.BadRequest(
+                        errorMessages: new string[] { e.Message }
+                    ));
+                }
+            } else {
+                createdVilla.ImageUrl = ConfigConstant.DefaultVillaImageUrl;
+            }
+
+            createdVilla.CreatedDate = DateTime.Now;
             await _repo.CreateAsync(createdVilla);
             
             var apiResponse = APIResponse.Created(_mapper.Map<VillaDTO>(createdVilla));

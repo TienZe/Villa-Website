@@ -16,6 +16,6 @@ public class VillaCreateDTO
     [Required(ErrorMessage = "Rate is required")]
     public double? Rate { get; set; }
 
-    public string? ImageUrl { get; set; } = string.Empty;
+    public IFormFile? Image { get; set; }
     public string? Amenity { get; set; } = string.Empty;
 }
