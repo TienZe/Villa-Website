@@ -148,6 +148,11 @@ namespace VillaAPI
                     errorMessages: new string[] { "Villa not found" }
                 ));
             }
+            
+            // Delete villa's image if exists
+            if (!string.IsNullOrEmpty(villa.ImageLocalPath)) {
+                _fileService.DeleteFile(villa.ImageLocalPath);
+            }
 
             await _repo.RemoveAsync(villa);
 
@@ -159,7 +164,7 @@ namespace VillaAPI
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> UpdateVilla(int id, [FromBody]VillaUpdateDTO villaDTO)
+        public async Task<ActionResult<APIResponse>> UpdateVilla(int id, [FromForm]VillaUpdateDTO villaDTO)
         {
             if (villaDTO is null) {
                 return BadRequest(APIResponse.BadRequest());
@@ -169,14 +174,36 @@ namespace VillaAPI
             if (villa is null) {
                 return NotFound(APIResponse.NotFound());
             }
-
+            
+            // Update villa props
             villa.Name = villaDTO.Name;
             villa.Occupancy = villaDTO.Occupancy;
             villa.Sqft = villaDTO.Sqft;
             villa.Rate = villaDTO.Rate;
-            villa.ImageUrl = villaDTO.ImageUrl;
             villa.Amenity = villaDTO.Amenity;
             villa.Details = villaDTO.Details;
+
+            if (villaDTO.NewImage is not null) {
+                string? oldImagePath = villa.ImageLocalPath;
+
+                // Upload new image
+                try {
+                    string filePath = _fileService.UploadImage(villaDTO.NewImage, ConfigConstant.VillaUploadImagePath);
+                    
+                    villa.ImageLocalPath = filePath;
+                    string baseUrl = $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase}";
+                    villa.ImageUrl = $"{baseUrl}/{filePath}";
+                } catch (Exception e) {
+                    return BadRequest(APIResponse.BadRequest(
+                        errorMessages: new string[] { e.Message }
+                    ));
+                }
+
+                // Delete old image if exists
+                if (!string.IsNullOrEmpty(oldImagePath)) {
+                    _fileService.DeleteFile(oldImagePath);
+                }
+            }
 
             await _repo.UpdateAsync(villa);
 
@@ -212,7 +239,6 @@ namespace VillaAPI
             villa.Occupancy = villaDTO.Occupancy;
             villa.Sqft = villaDTO.Sqft;
             villa.Rate = villaDTO.Rate;
-            villa.ImageUrl = villaDTO.ImageUrl;
             villa.Amenity = villaDTO.Amenity;
 
             await _repo.UpdateAsync(villa);

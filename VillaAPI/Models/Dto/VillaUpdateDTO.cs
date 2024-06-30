@@ -17,7 +17,8 @@ public class VillaUpdateDTO
 
     [Required]
     public double Rate { get; set; }
-    [Required]
-    public string? ImageUrl { get; set; } = string.Empty;
-    public string? Amenity { get; set; } = string.Empty;
+
+    public IFormFile? NewImage { get; set; }
+    
+    public string? Amenity { get; set; }
 }

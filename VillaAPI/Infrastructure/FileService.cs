@@ -1,5 +1,6 @@
 namespace VillaAPI.Infrastructure;
 
+// Class interact with files in wwwroot folder
 public class FileService
 {
     private readonly IWebHostEnvironment environment;
