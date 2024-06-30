@@ -67,6 +67,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Register SeedData
 builder.Services.AddScoped<SeedData>();
 
+builder.Services.AddSingleton<FileService>();
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
