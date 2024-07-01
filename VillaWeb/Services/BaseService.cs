@@ -18,7 +18,7 @@ public class BaseService : IBaseService
         TokenProvider = tokenProvider;
 
     }
-    public async Task<T?> SendAsync<T>(APIRequest apiRequest)
+    public async Task<T?> SendAsync<T>(APIRequest apiRequest, bool withBearerToken = true)
     {
         try {
             var client = HttpClient.CreateClient("VillaAPI");

@@ -22,7 +22,7 @@ public class AuthService : IAuthService
             Data = loginRequestDTO
         };
 
-        return await _baseService.SendAsync<T>(apiRequest);
+        return await _baseService.SendAsync<T>(apiRequest, withBearerToken: false);
     }
 
     public async Task<T?> RegisterAsync<T>(RegisterationRequestDTO registerationRequestDTO)
@@ -33,6 +33,6 @@ public class AuthService : IAuthService
             Data = registerationRequestDTO
         };
 
-        return await _baseService.SendAsync<T>(apiRequest);
+        return await _baseService.SendAsync<T>(apiRequest, withBearerToken: false);
     }
 }
