@@ -79,7 +79,7 @@ public class VillaController : Controller
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
                     TempData["success"] = "Villa updated successfully!";
-                    return RedirectToAction(nameof(IndexVilla));
+                    return RedirectToAction(nameof(UpdateVilla), new { Id = dto.Id });
                 }
                 // Error occurred
                 ModelState.AddErrors(apiResponse.ErrorMessages);
