@@ -63,7 +63,7 @@ public class UserRepository : IUserRepository
         var tokenString = tokenHandler.WriteToken(token);
 
         var tokenDTO = new TokenDTO() {
-            Token = tokenString
+            AccessToken = tokenString
         };
 
         return tokenDTO;

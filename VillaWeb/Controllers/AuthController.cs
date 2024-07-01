@@ -37,7 +37,7 @@ public class AuthController : Controller
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
                     var tokenDTO = JsonConvert.DeserializeObject<TokenDTO>(Convert.ToString(apiResponse.Result));
-                    string token = tokenDTO.Token;
+                    string token = tokenDTO.AccessToken;
                     HttpContext.Session.SetString(SD.AccessTokenKey, token);
 
                     // Decode token (header and payload) to get user claims
