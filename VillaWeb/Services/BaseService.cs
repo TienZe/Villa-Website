@@ -10,23 +10,25 @@ namespace VillaWeb.Services;
 
 public class BaseService : IBaseService
 {
-    public APIResponse ResponseModel { get; set; }
     protected IHttpClientFactory HttpClient { get; set; }
-    public BaseService(IHttpClientFactory httpClient)
+    protected ITokenProvider TokenProvider { get; set; }
+    public BaseService(IHttpClientFactory httpClient, ITokenProvider tokenProvider)
     {
         HttpClient = httpClient;
-        ResponseModel = new();
+        TokenProvider = tokenProvider;
+
     }
     public async Task<T?> SendAsync<T>(APIRequest apiRequest)
     {
         try {
             var client = HttpClient.CreateClient("VillaAPI");
-            HttpRequestMessage message = new();
-            // message.Headers.Add("Accept", "application/json");
-            message.RequestUri = new Uri(apiRequest.Url);
+            HttpRequestMessage message = new() {
+                RequestUri = new Uri(apiRequest.Url)
+            };
 
-            if (apiRequest.Token is not null) {
-                message.Headers.Add("Authorization", "Bearer " + apiRequest.Token);
+            var tokenDTO = TokenProvider.GetToken();
+            if (tokenDTO is not null) {
+                message.Headers.Add("Authorization", "Bearer " + tokenDTO.AccessToken);
             }
                 
             if (apiRequest.Data is not null) {

@@ -17,9 +17,11 @@ namespace VillaWeb.Controllers;
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
-    public AuthController(IAuthService authService)
+    private readonly ITokenProvider _tokenProvider;
+    public AuthController(IAuthService authService, ITokenProvider tokenProvider)
     {
         _authService = authService;
+        _tokenProvider = tokenProvider;
     }
 
     public IActionResult Login()
@@ -37,12 +39,14 @@ public class AuthController : Controller
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
                     var tokenDTO = JsonConvert.DeserializeObject<TokenDTO>(Convert.ToString(apiResponse.Result));
-                    string token = tokenDTO.AccessToken;
-                    HttpContext.Session.SetString(SD.AccessTokenKey, token);
+
+                    // Store the access token in cookie
+                    _tokenProvider.SetToken(tokenDTO);
 
                     // Decode token (header and payload) to get user claims
+                    string accessToken = tokenDTO.AccessToken;
                     var handler = new JwtSecurityTokenHandler();
-                    var jwtSecurityToken = handler.ReadJwtToken(token);
+                    var jwtSecurityToken = handler.ReadJwtToken(accessToken);
                     var claims = jwtSecurityToken.Claims.ToList();
 
                     string? userId = claims.FirstOrDefault(c => c.Type == "nameid")?.Value ?? "";
@@ -107,10 +111,11 @@ public class AuthController : Controller
     public async Task<IActionResult> Logout()
     {
         // Default authentication scheme configured in Program.cs is Cookie Authentication
-        // Delete cookie
+        // Delete authentication cookie
         await HttpContext.SignOutAsync();
-        // Remove the token stored in session
-        HttpContext.Session.SetString(SD.AccessTokenKey, ""); 
+
+        // Remove the token stored in cookie
+        _tokenProvider.ClearToken();
         return RedirectToAction("Index", "Home");
     }
 

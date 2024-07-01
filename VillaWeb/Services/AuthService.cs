@@ -7,7 +7,9 @@ namespace VillaWeb.Services;
 public class AuthService : BaseService, IAuthService
 {
     protected readonly string _villaUrl;
-    public AuthService(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
+    public AuthService(IHttpClientFactory httpClientFactory, ITokenProvider tokenProvider
+        , IConfiguration configuration) 
+            : base(httpClientFactory, tokenProvider)
     {
         _villaUrl = configuration["ServiceUrls:VillaAPI"];
     }

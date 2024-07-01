@@ -42,8 +42,7 @@ public class VillaController : Controller
     public async Task<IActionResult> CreateVilla(VillaCreateDTO dto)
     {
         if (ModelState.IsValid) {
-            var token = HttpContext.Session.GetString(SD.AccessTokenKey);
-            var apiResponse = await _villaService.CreateAsync<APIResponse>(dto, token);
+            var apiResponse = await _villaService.CreateAsync<APIResponse>(dto);
 
             if (apiResponse is not null ) {
                 if (apiResponse.IsSuccess) {
@@ -73,8 +72,7 @@ public class VillaController : Controller
     public async Task<IActionResult> UpdateVilla(VillaUpdateDTO dto)
     {
         if (ModelState.IsValid) {
-            var token = HttpContext.Session.GetString(SD.AccessTokenKey);
-            var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto, token);
+            var apiResponse = await _villaService.UpdateAsync<APIResponse>(dto);
 
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
@@ -91,8 +89,7 @@ public class VillaController : Controller
     [HttpPost]
     public async Task<IActionResult> DeleteVilla([FromForm]int id)
     {
-        var token = HttpContext.Session.GetString(SD.AccessTokenKey);
-        var apiResponse = await _villaService.DeleteAsync<APIResponse>(id, token);
+        var apiResponse = await _villaService.DeleteAsync<APIResponse>(id);
 
         if (apiResponse is not null) {
             if (apiResponse.IsSuccess) {
