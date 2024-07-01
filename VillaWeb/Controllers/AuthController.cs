@@ -37,7 +37,7 @@ public class AuthController : Controller
                 if (apiResponse.IsSuccess) {
                     var loginResponseDTO = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(apiResponse.Result));
                     string token = loginResponseDTO.Token;
-                    HttpContext.Session.SetString(SD.SessionTokenKey, token);
+                    HttpContext.Session.SetString(SD.AccessTokenKey, token);
 
                     // Create claims
                     var identity = new ClaimsIdentity(new[] {
@@ -97,7 +97,7 @@ public class AuthController : Controller
         // Delete cookie
         await HttpContext.SignOutAsync();
         // Remove the token stored in session
-        HttpContext.Session.SetString(SD.SessionTokenKey, ""); 
+        HttpContext.Session.SetString(SD.AccessTokenKey, ""); 
         return RedirectToAction("Index", "Home");
     }
 

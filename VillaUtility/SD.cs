@@ -14,5 +14,5 @@ public static class SD
         public const string User = "User";
         public static string[] GetRoles() => new string[] { Admin, User };
     }
-    public static string SessionTokenKey = "JWTToken";
+    public static string AccessTokenKey = "JWTToken";
 }

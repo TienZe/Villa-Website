@@ -56,7 +56,7 @@ public class VillaNumberController : Controller
     public async Task<IActionResult> CreateVillaNumber(VillaNumberCreateVM villaNumberCreateVM)
     {
         if (ModelState.IsValid) {
-            var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+            var token = HttpContext.Session.GetString(SD.AccessTokenKey);
             var apiResponse = await _villaNumberService.CreateAsync<APIResponse>(villaNumberCreateVM.VillaNumber, token);
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
@@ -111,7 +111,7 @@ public class VillaNumberController : Controller
     public async Task<IActionResult> UpdateVillaNumber(VillaNumberUpdateVM villaNumberUpdateVM)
     {
         if (ModelState.IsValid) {
-            var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+            var token = HttpContext.Session.GetString(SD.AccessTokenKey);
             var apiResponse = await _villaNumberService.UpdateAsync<APIResponse>(villaNumberUpdateVM.VillaNumber, token);
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
@@ -139,7 +139,7 @@ public class VillaNumberController : Controller
     [HttpPost]
     public async Task<IActionResult> DeleteVillaNumber([FromForm]int id)
     {
-        var token = HttpContext.Session.GetString(SD.SessionTokenKey);
+        var token = HttpContext.Session.GetString(SD.AccessTokenKey);
         var apiResponse = await _villaNumberService.DeleteAsync<APIResponse>(id, token);
 
         if (apiResponse is not null && apiResponse.IsSuccess) {
