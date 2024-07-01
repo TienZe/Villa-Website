@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0-preview1" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -21,6 +22,10 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Villa\UpdateVilla.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Filters\" />
   </ItemGroup>
 
 </Project>

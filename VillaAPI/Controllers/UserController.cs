@@ -21,15 +21,15 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody]LoginRequestDTO loginRequestDTO)
     {
-        LoginResponseDTO? loginResponse = await _userRepo.Login(loginRequestDTO);
-        if (loginResponse is null)
+        TokenDTO? tokenDTO = await _userRepo.Login(loginRequestDTO);
+        if (tokenDTO is null)
         {
             return BadRequest(APIResponse.BadRequest(
                 errorMessages: new string[] { "Invalid username or password" }
             ));
         }
 
-        return Ok(APIResponse.Ok(loginResponse));
+        return Ok(APIResponse.Ok(tokenDTO));
     }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody]RegisterationRequestDTO registerationRequestDTO)

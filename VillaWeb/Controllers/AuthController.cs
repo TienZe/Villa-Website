@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
@@ -35,16 +36,28 @@ public class AuthController : Controller
 
             if (apiResponse is not null) {
                 if (apiResponse.IsSuccess) {
-                    var loginResponseDTO = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(apiResponse.Result));
-                    string token = loginResponseDTO.Token;
+                    var tokenDTO = JsonConvert.DeserializeObject<TokenDTO>(Convert.ToString(apiResponse.Result));
+                    string token = tokenDTO.Token;
                     HttpContext.Session.SetString(SD.AccessTokenKey, token);
 
+                    // Decode token (header and payload) to get user claims
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtSecurityToken = handler.ReadJwtToken(token);
+                    var claims = jwtSecurityToken.Claims.ToList();
+
+                    string? userId = claims.FirstOrDefault(c => c.Type == "nameid")?.Value ?? "";
+                    string? userName = claims.FirstOrDefault(c => c.Type == "unique_name")?.Value ?? "";
+                    string? userRole = claims.FirstOrDefault(c => c.Type == "role")?.Value ?? "";
+
                     // Create claims
-                    var identity = new ClaimsIdentity(new[] {
-                        new Claim(ClaimTypes.Name, loginResponseDTO.User.UserName),
-                        new Claim(ClaimTypes.NameIdentifier, loginResponseDTO.User.Id.ToString()),
-                        new Claim(ClaimTypes.Role, loginResponseDTO.Role)
-                    }, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var identity = new ClaimsIdentity(
+                        new[] {
+                            new Claim(ClaimTypes.Name, userName),
+                            new Claim(ClaimTypes.NameIdentifier, userId),
+                            new Claim(ClaimTypes.Role, userRole)
+                        }, 
+                        CookieAuthenticationDefaults.AuthenticationScheme
+                    );
 
                     // Create principal
                     var principal = new ClaimsPrincipal(identity);

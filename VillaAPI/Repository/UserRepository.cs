@@ -33,7 +33,7 @@ public class UserRepository : IUserRepository
         return user is null;
     }
 
-    public async Task<LoginResponseDTO?> Login(LoginRequestDTO loginRequestDTO)
+    public async Task<TokenDTO?> Login(LoginRequestDTO loginRequestDTO)
     {
         var user = await _userManager.FindByNameAsync(loginRequestDTO.Username);
         var isValidCredentials = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
@@ -62,13 +62,11 @@ public class UserRepository : IUserRepository
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var tokenString = tokenHandler.WriteToken(token);
 
-        var loginResponse = new LoginResponseDTO() {
-            User = new UserDTO { Id = user.Id, Name = user.Name, UserName = user.UserName},
-            Role = userRole,
+        var tokenDTO = new TokenDTO() {
             Token = tokenString
         };
 
-        return loginResponse;
+        return tokenDTO;
     }   
 
     public async Task<ApplicationUser> Register(RegisterationRequestDTO registerationRequestDTO)
