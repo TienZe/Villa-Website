@@ -41,29 +41,10 @@ public class UserRepository : IUserRepository
             return null;
         }
         
-        var roles = await _userManager.GetRolesAsync(user);
-        var userRole = roles.FirstOrDefault();
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_secretKey);
-
-        var tokenDescriptor = new SecurityTokenDescriptor() {
-            Subject = new ClaimsIdentity(
-                new Claim[] {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Role, userRole)
-                }
-            ),
-            Expires = DateTime.UtcNow.AddHours(10),
-            SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
+        var accessToken = await GenerateAccessToken(user);
 
         var tokenDTO = new TokenDTO() {
-            AccessToken = tokenString
+            AccessToken = accessToken
         };
 
         return tokenDTO;
@@ -89,5 +70,31 @@ public class UserRepository : IUserRepository
         }
 
         return newUser;
+    }
+
+    private async Task<string> GenerateAccessToken(ApplicationUser user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        var userRole = roles.FirstOrDefault();
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_secretKey);
+
+        var tokenDescriptor = new SecurityTokenDescriptor() {
+            Subject = new ClaimsIdentity(
+                new Claim[] {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Role, userRole)
+                }
+            ),
+            Expires = DateTime.UtcNow.AddHours(10),
+            SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
+
+        return tokenString;
     }
 }
