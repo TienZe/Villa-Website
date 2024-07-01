@@ -4,13 +4,13 @@ using VillaWeb.Services.IServices;
 using static VillaUtility.SD;
 
 namespace VillaWeb.Services;
-public class AuthService : BaseService, IAuthService
+public class AuthService : IAuthService
 {
     protected readonly string _villaUrl;
-    public AuthService(IHttpClientFactory httpClientFactory, ITokenProvider tokenProvider
-        , IConfiguration configuration) 
-            : base(httpClientFactory, tokenProvider)
+    protected readonly IBaseService _baseService;
+    public AuthService(IBaseService baseService, IConfiguration configuration) 
     {
+        _baseService = baseService;
         _villaUrl = configuration["ServiceUrls:VillaAPI"];
     }
 
@@ -22,7 +22,7 @@ public class AuthService : BaseService, IAuthService
             Data = loginRequestDTO
         };
 
-        return await SendAsync<T>(apiRequest);
+        return await _baseService.SendAsync<T>(apiRequest);
     }
 
     public async Task<T?> RegisterAsync<T>(RegisterationRequestDTO registerationRequestDTO)
@@ -33,6 +33,6 @@ public class AuthService : BaseService, IAuthService
             Data = registerationRequestDTO
         };
 
-        return await SendAsync<T>(apiRequest);
+        return await _baseService.SendAsync<T>(apiRequest);
     }
 }
