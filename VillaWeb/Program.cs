@@ -10,15 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    int idleTimeout = builder.Configuration.GetValue<int>("SessionAndCookiesIdleTimeout");
-    options.IdleTimeout = TimeSpan.FromMinutes(idleTimeout); // How long the session can be idle before it expires
-                                                             // Renew automatically the expiration time if accessing the session
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+// builder.Services.AddDistributedMemoryCache();
+// builder.Services.AddSession(options =>
+// {
+//     int idleTimeout = builder.Configuration.GetValue<int>("SessionAndCookiesIdleTimeout");
+//     options.IdleTimeout = TimeSpan.FromMinutes(idleTimeout); // How long the session can be idle before it expires
+//                                                              // Renew automatically the expiration time if accessing the session
+//     options.Cookie.HttpOnly = true;
+//     options.Cookie.IsEssential = true;
+// });
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -76,7 +76,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSession();
+// app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
