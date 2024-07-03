@@ -13,26 +13,34 @@ public class TokenProvider : ITokenProvider
     }
     public void ClearToken()
     {
-        _httpContextAccessor.HttpContext?.Response.Cookies.Delete(SD.AccessTokenKey);
+        _httpContextAccessor.HttpContext?.Response.Cookies.Delete(SD.AccessTokenCookieName);
+        _httpContextAccessor.HttpContext?.Response.Cookies.Delete(SD.RefreshTokenCookieName);
     }
 
     public TokenDTO? GetToken()
     {
         string? accessToken = null;
-        _httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue(SD.AccessTokenKey, out accessToken);
+        string? refreshToken = null;
 
-        if (accessToken is null) {
+        _httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue(SD.AccessTokenCookieName, out accessToken);
+        _httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue(SD.RefreshTokenCookieName, out refreshToken);
+
+        if (accessToken is null || refreshToken is null) {
             return null;
         }
 
-        return new TokenDTO { AccessToken = accessToken }; 
+        return new TokenDTO { 
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        }; 
     }
 
     public void SetToken(TokenDTO tokenDTO)
     {
         var cookieOption = new CookieOptions {
-            Expires = DateTime.UtcNow.AddHours(10),
+            Expires = DateTime.UtcNow.AddMonths(1),
         };
-        _httpContextAccessor.HttpContext?.Response.Cookies.Append(SD.AccessTokenKey, tokenDTO.AccessToken, cookieOption);
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(SD.AccessTokenCookieName, tokenDTO.AccessToken, cookieOption);
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(SD.RefreshTokenCookieName, tokenDTO.RefreshToken, cookieOption);
     }
 }
