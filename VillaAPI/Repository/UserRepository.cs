@@ -93,13 +93,13 @@ public class UserRepository : IUserRepository
         var tokenDescriptor = new SecurityTokenDescriptor() {
             Subject = new ClaimsIdentity(
                 new Claim[] {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Role, userRole),
                     new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id)
                 }
             ),
-            Expires = DateTime.UtcNow.AddMinutes(1),
+            Expires = DateTime.UtcNow.AddSeconds(30),
             SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
@@ -122,7 +122,7 @@ public class UserRepository : IUserRepository
             JwtTokenId = tokenId,
             Refresh_Token = $"{Guid.NewGuid()}-{Guid.NewGuid()}",
             IsValid = true,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(3)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(5)
         };
 
         await _db.RefreshTokens.AddAsync(refreshToken);
@@ -139,7 +139,7 @@ public class UserRepository : IUserRepository
             var claims = jwt.Claims.ToList();
 
             string tokenId = claims.First(c => c.Type == JwtRegisteredClaimNames.Jti).Value;
-            string userId = claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+            string userId = claims.First(c => c.Type == "nameid").Value;
             return (true, userId, tokenId);
         } catch (Exception) {
             return (false, "", "");
