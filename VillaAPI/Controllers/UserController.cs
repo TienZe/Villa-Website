@@ -31,6 +31,7 @@ public class UserController : ControllerBase
 
         return Ok(APIResponse.Ok(tokenDTO));
     }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody]RegisterationRequestDTO registerationRequestDTO)
     {
@@ -62,5 +63,19 @@ public class UserController : ControllerBase
         }
 
         return Ok(APIResponse.Ok());
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> GetNewTokenFromRefreshToken([FromBody]TokenDTO tokenDTO)
+    {
+        TokenDTO? newTokenDTO = await _userRepo.RefreshAccessToken(tokenDTO);
+
+        if (newTokenDTO is null || string.IsNullOrEmpty(newTokenDTO.AccessToken)) {
+            return BadRequest(APIResponse.BadRequest(
+                errorMessages: new string[] { "Invalid token" }
+            ));
+        }
+        
+        return Ok(APIResponse.Ok(newTokenDTO));
     }
 }
