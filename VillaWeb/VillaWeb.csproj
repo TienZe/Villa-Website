@@ -24,8 +24,4 @@
     <_ContentIncludedByDefault Remove="Views\Villa\UpdateVilla.cshtml" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Filters\" />
-  </ItemGroup>
-
 </Project>

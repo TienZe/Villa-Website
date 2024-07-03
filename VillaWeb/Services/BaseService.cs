@@ -92,6 +92,8 @@ public class BaseService : IBaseService
             var apiResponseObject = JsonConvert.DeserializeObject<T>(apiContent);
 
             return apiResponseObject;
+        } catch (UnauthorizedException) {
+            throw;
         } catch (Exception e) {
             var dto = new APIResponse() {
                 StatusCode = HttpStatusCode.InternalServerError,
@@ -129,6 +131,8 @@ public class BaseService : IBaseService
             if (newToken is null) {
                 // Sign out the user
                 await SignInService.SignOutAsync();
+
+                throw new UnauthorizedException();
             } else {
                 // Sign in the user with the new token
                 await SignInService.SignInAsync(newToken);

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using VillaWeb;
+using VillaWeb.Infrastructures;
 using VillaWeb.Services;
 using VillaWeb.Services.IServices;
 
@@ -34,7 +36,9 @@ builder.Services.AddAuthentication(options => {
     options.AccessDeniedPath = "/Auth/AccessDenied";
 });
 
-
+builder.Services.Configure<MvcOptions>(options => {
+    options.Filters.Add<AuthRedirectionExceptionFilter>();
+});
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 
