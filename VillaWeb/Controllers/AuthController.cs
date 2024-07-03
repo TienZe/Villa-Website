@@ -1,12 +1,5 @@
-﻿using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using AutoMapper;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using VillaUtility;
 using VillaWeb.Infrastructures;
 using VillaWeb.Models;
 using VillaWeb.Models.Dto;
@@ -17,11 +10,11 @@ namespace VillaWeb.Controllers;
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
-    private readonly ITokenProvider _tokenProvider;
-    public AuthController(IAuthService authService, ITokenProvider tokenProvider)
+    private readonly ISignInService _signInService;
+    public AuthController(IAuthService authService, ISignInService signInService)
     {
         _authService = authService;
-        _tokenProvider = tokenProvider;
+        _signInService = signInService;
     }
 
     public IActionResult Login()
@@ -40,40 +33,7 @@ public class AuthController : Controller
                 if (apiResponse.IsSuccess) {
                     var tokenDTO = JsonConvert.DeserializeObject<TokenDTO>(Convert.ToString(apiResponse.Result));
 
-                    // Store the access token in cookie
-                    _tokenProvider.SetToken(tokenDTO);
-
-                    // Decode token (header and payload) to get user claims
-                    string accessToken = tokenDTO.AccessToken;
-                    var handler = new JwtSecurityTokenHandler();
-                    var jwtSecurityToken = handler.ReadJwtToken(accessToken);
-                    var claims = jwtSecurityToken.Claims.ToList();
-
-                    string? userId = claims.FirstOrDefault(c => c.Type == "nameid")?.Value ?? "";
-                    string? userName = claims.FirstOrDefault(c => c.Type == "unique_name")?.Value ?? "";
-                    string? userRole = claims.FirstOrDefault(c => c.Type == "role")?.Value ?? "";
-
-                    // Create claims
-                    var identity = new ClaimsIdentity(
-                        new[] {
-                            new Claim(ClaimTypes.Name, userName),
-                            new Claim(ClaimTypes.NameIdentifier, userId),
-                            new Claim(ClaimTypes.Role, userRole)
-                        }, 
-                        CookieAuthenticationDefaults.AuthenticationScheme
-                    );
-
-                    // Create principal
-                    var principal = new ClaimsPrincipal(identity);
-                    
-                    // Sign in
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme, 
-                        principal, 
-                        new AuthenticationProperties {
-                            IsPersistent = true
-                        }
-                    );
+                    await _signInService.SignInAsync(tokenDTO);
 
                     TempData["success"] = "You are logged in!";
                     return RedirectToAction("Index", "Home");
@@ -110,12 +70,7 @@ public class AuthController : Controller
 
     public async Task<IActionResult> Logout()
     {
-        // Default authentication scheme configured in Program.cs is Cookie Authentication
-        // Delete authentication cookie
-        await HttpContext.SignOutAsync();
-
-        // Remove the token stored in cookie
-        _tokenProvider.ClearToken();
+        _signInService.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }
 
